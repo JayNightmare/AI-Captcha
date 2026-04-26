@@ -1,0 +1,18 @@
+name: Verify CAPTCHA
+
+on: [pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Verify CAPTCHA
+      run: |
+        if [[ ! "${{ github.event.pull_request.title }}" =~ \[CAPTCHA:fail.* ]] && [[ ! "${{ github.event.pull_request.body }}" =~ \[CAPTCHA:fail.* ]]; then
+          echo "No fail tag detected."
+        else
+          gh pr label ${{ github.event.pull_request.number }} --add "ai-suspect"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
